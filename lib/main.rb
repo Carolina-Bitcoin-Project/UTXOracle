@@ -23,18 +23,15 @@ class UTXOracle
   end
 
   def price(requested_date)
+    unless validate_date(requested_date)
+      puts "Invalid date.\nEarliest available: 2020-07-26.\nLatest available #{Date.today}.\nFormat: YYYY-MM-DD."
+      return
+    end
+
     if price_estimate = @cache[requested_date]
       puts "price_estimate is #{price_estimate}"
       return price_estimate
     end
-    puts "Ruby UTXOracle version 1\n\n" if @log
-
-    # TODO - move this to validation block, print as bounds error
-    #puts "Earliest available price: 7-26-20"
-    #puts "Latest available price: #{latest_price_date}"
-    #puts "Enter the date to request (YYYY-MM-DD): "
-
-
 
     @requested_date = Time.parse requested_date.tr('\n', '')
     @cache[requested_date] = run
@@ -372,15 +369,25 @@ class UTXOracle
     ]
   end
 
+  def validate_date(date)
+    y, m, d = date.split '-'
+    valid_format = Date.valid_date? y.to_i, m.to_i, d.to_i
+
+    valid_range = (Date.parse(date) > Date.parse("2020-7-26")) &&
+      (Date.parse(date) < Date.today)
+
+    valid_format && valid_range
+  end
+
 end
 
 
 oracle = UTXOracle.new
 
-oracle.price("2023-10-10")
-oracle.price("2023-10-10")
-oracle.price("2023-10-12")
-oracle.price("2023-10-12")
-oracle.price("2023-10-12")
-oracle.price("2023-10-13")
+oracle.price("2027-10-10")
+#oracle.price("2023-10-10")
+#oracle.price("2023-10-12")
+#oracle.price("2023-10-12")
+#oracle.price("2023-10-12")
+#oracle.price("2023-10-13")
 #oracle.price("2023-10-12") # can request many dates
