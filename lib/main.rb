@@ -1,6 +1,6 @@
 require 'time'
 require './bitcoin_rpc.rb'
-require 'pry' # REMOVE
+require 'pry'
 
 class UTXOracle
 
@@ -12,14 +12,11 @@ class UTXOracle
 
   NUMBER_OF_BINS = 2401.freeze
 
-  # opts: testnet or main net, user, password, port.
-  def initialize(log=false)
-    # TODO - params username, password, IP, port
-    @client = BitcoinRPC.new('http://foo:bar@127.0.0.1:8332')
-    @round_usd_stencil = build_round_usd_stencil # TODO - reuse
-
-    @log = log
-    @cache = {}
+  def initialize(rpcuser, rpcpassword, ip, port, log=false)
+    @client             = BitcoinRPC.new("http://#{rpcuser}:#{rpcpassword}@#{ip}:#{port}")
+    @round_usd_stencil  = build_round_usd_stencil
+    @log                = log
+    @cache              = {}
   end
 
   def price(requested_date)
@@ -382,12 +379,5 @@ class UTXOracle
 end
 
 
-oracle = UTXOracle.new
-
-oracle.price("2027-10-10")
-#oracle.price("2023-10-10")
-#oracle.price("2023-10-12")
-#oracle.price("2023-10-12")
-#oracle.price("2023-10-12")
-#oracle.price("2023-10-13")
-#oracle.price("2023-10-12") # can request many dates
+oracle = UTXOracle.new("aUser", "aPassword", "127.0.0.1", "8332", logs=true)
+oracle.price("2021-09-10")
