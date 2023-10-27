@@ -19,9 +19,14 @@ class UTXOracle
     @round_usd_stencil = build_round_usd_stencil # TODO - reuse
 
     @log = log
+    @cache = {}
   end
 
   def price(requested_date)
+    if price_estimate = @cache[requested_date]
+      puts "price_estimate is #{price_estimate}"
+      return price_estimate
+    end
     puts "Ruby UTXOracle version 1\n\n" if @log
 
     # TODO - move this to validation block, print as bounds error
@@ -32,9 +37,7 @@ class UTXOracle
 
 
     @requested_date = Time.parse requested_date.tr('\n', '')
-    run
-
-    # TODO - since historical UTXO set is static, cache prices for given date
+    @cache[requested_date] = run
   end
 
   private
@@ -292,6 +295,7 @@ class UTXOracle
 
     puts "price_estimate is #{price_estimate}"
 
+    price_estimate
   end
 
   def build_round_usd_stencil
@@ -374,5 +378,9 @@ end
 oracle = UTXOracle.new
 
 oracle.price("2023-10-10")
+oracle.price("2023-10-10")
 oracle.price("2023-10-12")
+oracle.price("2023-10-12")
+oracle.price("2023-10-12")
+oracle.price("2023-10-13")
 #oracle.price("2023-10-12") # can request many dates
