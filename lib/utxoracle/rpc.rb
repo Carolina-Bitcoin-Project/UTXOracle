@@ -2,7 +2,7 @@ require 'net/http'
 require 'uri'
 require 'json'
 
-class BitcoinRPC
+class Rpc
 	def initialize(service_url)
 		@uri = URI.parse(service_url)
 	end

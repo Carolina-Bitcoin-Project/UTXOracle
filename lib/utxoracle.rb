@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative 'nostr/bitcoin_rpc'
+require_relative 'utxoracle/rpc'
+require_relative 'utxoracle/version'
 
-# Encapsulates all the gem's logic
 module UTXOracle
 end

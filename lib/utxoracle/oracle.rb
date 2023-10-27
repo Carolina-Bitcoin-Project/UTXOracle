@@ -1,19 +1,16 @@
 require 'time'
-require './bitcoin_rpc.rb'
-require 'pry'
+require './rpc.rb'
 
-class UTXOracle
+class Oracle
 
-  SECONDS_IN_A_DAY = 60*60*24.freeze
-  FOUR_HOURS = 14400.freeze
-
-  MAINNET_PORT = 8332.freeze
-  TESTNET_PORT = 18332.freeze
-
-  NUMBER_OF_BINS = 2401.freeze
+  SECONDS_IN_A_DAY      = 60*60*24.freeze
+  FOUR_HOURS            = 14400.freeze
+  MAINNET_PORT          = 8332.freeze
+  TESTNET_PORT          = 18332.freeze
+  NUMBER_OF_BINS        = 2401.freeze
 
   def initialize(rpcuser, rpcpassword, ip, port, log=false)
-    @client             = BitcoinRPC.new("http://#{rpcuser}:#{rpcpassword}@#{ip}:#{port}")
+    @client             = Rpc.new("http://#{rpcuser}:#{rpcpassword}@#{ip}:#{port}")
     @round_usd_stencil  = build_round_usd_stencil
     @log                = log
     @cache              = {}
@@ -36,6 +33,7 @@ class UTXOracle
 
   private
 
+  # TODO - this is very procedural right now. We can DRY this out later on.
   def run
     block_count     = @client.getblockcount
     block_hash      = @client.getblockhash(block_count)
@@ -52,7 +50,6 @@ class UTXOracle
     latest_price_day = Time.at(yesterday_seconds).utc
     latest_price_date = latest_price_day.utc.strftime("%Y-%m-%d")
 
-
     price_day_seconds =  @requested_date.to_i - FOUR_HOURS
     price_day_date_utc = @requested_date
 
@@ -60,12 +57,9 @@ class UTXOracle
     blocks_ago_estimate = (144 * seconds_since_price_day.to_f / SECONDS_IN_A_DAY.to_f).round
     price_day_block_estimate = (block_count - blocks_ago_estimate).to_i
 
-
     block_hash_b       = @client.getblockhash(price_day_block_estimate)
     block_header       = @client.getblockheader(block_hash_b, true)
     time_in_seconds = block_header['time']
-
-
 
     seconds_difference = time_in_seconds - price_day_seconds
     block_jump_estimate = (144.0*seconds_difference/SECONDS_IN_A_DAY).round
@@ -83,7 +77,7 @@ class UTXOracle
       time_in_seconds = block_header['time']
       seconds_difference = time_in_seconds - price_day_seconds
       block_jump_estimate = (144.0*seconds_difference/SECONDS_IN_A_DAY).round
-    end # Good
+    end
 
     if time_in_seconds > price_day_seconds
       while time_in_seconds > price_day_seconds
@@ -93,7 +87,6 @@ class UTXOracle
         time_in_seconds = block_header['time']
       end
 
-      # The guess is now perfectly the first block before midnight
       price_day_block_estimate = price_day_block_estimate + 1
     elsif time_in_seconds < price_day_seconds
       while time_in_seconds < price_day_seconds
@@ -154,7 +147,7 @@ class UTXOracle
     minute = time.min
 
     target = day
-    blocks_on_this_day = 0 # Keep track of how many blocks we process
+    blocks_on_this_day = 0
 
     while target == day do
       blocks_on_this_day += 1
@@ -183,7 +176,6 @@ class UTXOracle
         end
       end
 
-      # get next block
       block_height += 1
       block_hash_b = @client.getblockhash(block_height)
       block_b = @client.getblock(block_hash_b, 2)
@@ -379,5 +371,5 @@ class UTXOracle
 end
 
 
-oracle = UTXOracle.new("aUser", "aPassword", "127.0.0.1", "8332", logs=true)
+oracle = Oracle.new("aUser", "aPassword", "127.0.0.1", "8332", logs=true)
 oracle.price("2021-09-10")
