@@ -1,16 +1,15 @@
 require 'time'
-require_relative 'rpc.rb'
+require_relative 'rpc'
 
 class Oracle
+  SECONDS_IN_A_DAY      = 60 * 60 * 24
+  FOUR_HOURS            = 14_400
+  MAINNET_PORT          = 8332
+  TESTNET_PORT          = 18_332
+  NUMBER_OF_BINS        = 2401
 
-  SECONDS_IN_A_DAY      = 60*60*24.freeze
-  FOUR_HOURS            = 14400.freeze
-  MAINNET_PORT          = 8332.freeze
-  TESTNET_PORT          = 18332.freeze
-  NUMBER_OF_BINS        = 2401.freeze
-
-  # TODO - Thread safety
-  def initialize(rpcuser, rpcpassword, ip, port, log=false)
+  # TODO: - Thread safety
+  def initialize(rpcuser, rpcpassword, ip, port, log = false)
     @client             = Rpc.new("http://#{rpcuser}:#{rpcpassword}@#{ip}:#{port}")
     @round_usd_stencil  = build_round_usd_stencil
     @log                = log
@@ -34,13 +33,13 @@ class Oracle
 
   private
 
-  # TODO - Very procedural. Refactor
+  # TODO: - Very procedural. Refactor
   def run
     block_count     = @client.getblockcount
     block_hash      = @client.getblockhash(block_count)
     blockheader     = @client.getblockheader(block_hash, true)
 
-    time_datetime = Time.at(blockheader["time"]).utc
+    time_datetime = Time.at(blockheader['time']).utc
     latest_year = time_datetime.year
     latest_month = time_datetime.month
     latest_day = time_datetime.day
@@ -49,7 +48,7 @@ class Oracle
     latest_time_in_seconds = blockheader['time']
     yesterday_seconds = latest_time_in_seconds - SECONDS_IN_A_DAY
     latest_price_day = Time.at(yesterday_seconds).utc
-    latest_price_date = latest_price_day.utc.strftime("%Y-%m-%d")
+    latest_price_date = latest_price_day.utc.strftime('%Y-%m-%d')
 
     price_day_seconds =  @requested_date.to_i - FOUR_HOURS
     price_day_date_utc = @requested_date
@@ -63,7 +62,7 @@ class Oracle
     time_in_seconds = block_header['time']
 
     seconds_difference = time_in_seconds - price_day_seconds
-    block_jump_estimate = (144.0*seconds_difference/SECONDS_IN_A_DAY).round
+    block_jump_estimate = (144.0 * seconds_difference / SECONDS_IN_A_DAY).round
 
     last_estimate = 0
     last_last_estimate = 0
@@ -71,13 +70,13 @@ class Oracle
       last_last_estimate = last_estimate
       last_estimate = block_jump_estimate
 
-      price_day_block_estimate = price_day_block_estimate - block_jump_estimate
+      price_day_block_estimate -= block_jump_estimate
       block_hash_b       = @client.getblockhash(price_day_block_estimate)
       block_header       = @client.getblockheader(block_hash_b, true)
 
       time_in_seconds = block_header['time']
       seconds_difference = time_in_seconds - price_day_seconds
-      block_jump_estimate = (144.0*seconds_difference/SECONDS_IN_A_DAY).round
+      block_jump_estimate = (144.0 * seconds_difference / SECONDS_IN_A_DAY).round
     end
 
     if time_in_seconds > price_day_seconds
@@ -88,7 +87,7 @@ class Oracle
         time_in_seconds = block_header['time']
       end
 
-      price_day_block_estimate = price_day_block_estimate + 1
+      price_day_block_estimate += 1
     elsif time_in_seconds < price_day_seconds
       while time_in_seconds < price_day_seconds
         price_day_block_estimate += 1
@@ -100,10 +99,6 @@ class Oracle
 
     price_day_block = price_day_block_estimate
 
-
-
-
-
     # 5
     first_bin_value = -6
     last_bin_value = 6
@@ -113,7 +108,7 @@ class Oracle
 
     for exponent in -6..5
       for bin_width in 0..199
-        bin_value = 10 ** (exponent + bin_width/200.0).to_f
+        bin_value = 10**(exponent + bin_width / 200.0).to_f
         output_bell_curve_bins << bin_value
       end
     end
@@ -123,25 +118,17 @@ class Oracle
       output_bell_curve_bin_counts << 0.0
     end
 
-
-
-
-
-
-
-
-
     # 6
-    puts ("Reading all blocks on #{price_day_date_utc}...") if @log
-    puts ("This will take a few minutes (~144 blocks)...") if @log
-    puts ("Height\tTime(utc)\t Completion %") if @log
+    puts("Reading all blocks on #{price_day_date_utc}...") if @log
+    puts('This will take a few minutes (~144 blocks)...') if @log
+    puts("Height\tTime(utc)\t Completion %") if @log
 
     block_height = price_day_block_estimate
     block_hash_b = @client.getblockhash(block_height)
     block_b = @client.getblock(block_hash_b, 2)
 
-    time = Time.at(block_b["time"]).utc
-    time_in_seconds = block_b["time"]
+    time = Time.at(block_b['time']).utc
+    time_in_seconds = block_b['time']
 
     hour = time.hour
     day = time.day
@@ -150,30 +137,28 @@ class Oracle
     target = day
     blocks_on_this_day = 0
 
-    while target == day do
+    while target == day
       blocks_on_this_day += 1
 
-      progress_estimate = 100.0*(hour+minute/60)/24.0
-      puts ("#{block_height}\t#{time.strftime("%H:%M:%S")}\t#{progress_estimate}") if @log
+      progress_estimate = 100.0 * (hour + minute / 60) / 24.0
+      puts("#{block_height}\t#{time.strftime('%H:%M:%S')}\t#{progress_estimate}") if @log
 
-      for tx in block_b["tx"]
+      for tx in block_b['tx']
         outputs = tx['vout']
         for output in outputs
 
-          amount = output["value"]
-          if 1e-6 < amount && amount < 1e6
-            amount_log = Math::log10 amount
+          amount = output['value']
+          next unless 1e-6 < amount && amount < 1e6
 
-            percent_in_range = (amount_log - first_bin_value).to_f / range_bin_values.to_f
-            bin_number_est = (percent_in_range * NUMBER_OF_BINS).to_i
+          amount_log = Math.log10 amount
 
-            while output_bell_curve_bins[bin_number_est] <= amount
-              bin_number_est += 1
-            end
-            bin_number = bin_number_est - 1
+          percent_in_range = (amount_log - first_bin_value).to_f / range_bin_values.to_f
+          bin_number_est = (percent_in_range * NUMBER_OF_BINS).to_i
 
-            output_bell_curve_bin_counts[bin_number] += 1.0
-          end
+          bin_number_est += 1 while output_bell_curve_bins[bin_number_est] <= amount
+          bin_number = bin_number_est - 1
+
+          output_bell_curve_bin_counts[bin_number] += 1.0
         end
       end
 
@@ -181,16 +166,14 @@ class Oracle
       block_hash_b = @client.getblockhash(block_height)
       block_b = @client.getblock(block_hash_b, 2)
 
-      time = Time.at(block_b["time"]).utc
-      time_in_seconds = block_b["time"]
+      time = Time.at(block_b['time']).utc
+      time_in_seconds = block_b['time']
       hour = time.hour
       day = time.day
       minute = time.min
     end
 
     puts "blocks_on_this_day: #{blocks_on_this_day}" if @log
-
-
 
     # 7
     for n in 0..201 - 1
@@ -202,9 +185,9 @@ class Oracle
     end
 
     for r in round_btc_bins
-      amount_above = output_bell_curve_bin_counts[r+1]
-      amount_below = output_bell_curve_bin_counts[r-1]
-      output_bell_curve_bin_counts[r] = 0.5 * (amount_above+amount_below).to_f
+      amount_above = output_bell_curve_bin_counts[r + 1]
+      amount_below = output_bell_curve_bin_counts[r - 1]
+      output_bell_curve_bin_counts[r] = 0.5 * (amount_above + amount_below).to_f
     end
 
     curve_sum = 0.0
@@ -214,12 +197,8 @@ class Oracle
 
     for n in 201..1601 - 1
       output_bell_curve_bin_counts[n] /= curve_sum
-      if output_bell_curve_bin_counts[n] > 0.008
-        output_bell_curve_bin_counts[n] = 0.008
-      end
+      output_bell_curve_bin_counts[n] = 0.008 if output_bell_curve_bin_counts[n] > 0.008
     end
-
-
 
     # 9
     best_slide       = 0
@@ -235,7 +214,7 @@ class Oracle
 
       slide_score = 0.0
       for n in 0..shifted_curve.count - 1
-        slide_score += shifted_curve[n] * @round_usd_stencil[n+201]
+        slide_score += shifted_curve[n] * @round_usd_stencil[n + 201]
       end
 
       total_score += slide_score
@@ -247,19 +226,19 @@ class Oracle
       end
     end
 
-    usd100_in_btc_best = output_bell_curve_bins[801+best_slide]
-    btc_in_usd_best = 100/(usd100_in_btc_best)
+    usd100_in_btc_best = output_bell_curve_bins[801 + best_slide]
+    btc_in_usd_best = 100 / usd100_in_btc_best
 
-    neighbor_up = output_bell_curve_bin_counts.slice(201+best_slide+1, 1401+best_slide+1)
+    neighbor_up = output_bell_curve_bin_counts.slice(201 + best_slide + 1, 1401 + best_slide + 1)
     neighbor_up_score = 0.0
     for n in 0..neighbor_up.count - 1
-      neighbor_up_score += (neighbor_up[n]*@round_usd_stencil[n+201]).to_f
+      neighbor_up_score += (neighbor_up[n] * @round_usd_stencil[n + 201]).to_f
     end
 
-    neighbor_down = output_bell_curve_bin_counts.slice(201+best_slide-1, 1401+best_slide-1)
+    neighbor_down = output_bell_curve_bin_counts.slice(201 + best_slide - 1, 1401 + best_slide - 1)
     neighbor_down_score = 0.0
     for n in 0..neighbor_down.count - 1
-      neighbor_down_score += (neighbor_down[n]*@round_usd_stencil[n+201]).to_f
+      neighbor_down_score += (neighbor_down[n] * @round_usd_stencil[n + 201]).to_f
     end
 
     best_neighbor = +1
@@ -269,16 +248,16 @@ class Oracle
       neighbor_score = neighbor_down_score
     end
 
-    usd100_in_btc_2nd = output_bell_curve_bins[801+best_slide+best_neighbor]
-    btc_in_usd_2nd = 100/(usd100_in_btc_2nd).to_f
+    usd100_in_btc_2nd = output_bell_curve_bins[801 + best_slide + best_neighbor]
+    btc_in_usd_2nd = 100 / usd100_in_btc_2nd.to_f
 
-    #weight average the two usd price estimates
-    avg_score = total_score/number_of_scores.to_f
+    # weight average the two usd price estimates
+    avg_score = total_score / number_of_scores.to_f
     a1 = best_slide_score - avg_score
-    a2 = (neighbor_score - avg_score).abs  #theoretically possible to be negative
-    w1 = a1/(a1+a2).to_f
-    w2 = a2/(a1+a2)
-    price_estimate = (w1*btc_in_usd_best + w2*btc_in_usd_2nd).to_i
+    a2 = (neighbor_score - avg_score).abs # theoretically possible to be negative
+    w1 = a1 / (a1 + a2).to_f
+    w2 = a2 / (a1 + a2)
+    price_estimate = (w1 * btc_in_usd_best + w2 * btc_in_usd_2nd).to_i
 
     puts "price_estimate is #{price_estimate}"
 
@@ -323,15 +302,15 @@ class Oracle
     round_usd_stencil[939] = 0.0025995335505435034     # $500
     round_usd_stencil[940] = 0.0032631930982226645     # (larger needed range for fees)
     round_usd_stencil[941] = 0.0042753262790881080
-    round_usd_stencil[1001] =0.0037699501474772350     # $1,000
-    round_usd_stencil[1002] =0.0030872891064215764     # (larger needed range for fees)
-    round_usd_stencil[1003] =0.0023237040836798163
-    round_usd_stencil[1061] =0.0023671764210889895     # $2,000
-    round_usd_stencil[1062] =0.0020106877104798474
-    round_usd_stencil[1140] =0.0009099214128654502     # $3,000
-    round_usd_stencil[1141] =0.0012008546799361498
-    round_usd_stencil[1201] =0.0007862586076341524     # $10,000
-    round_usd_stencil[1202] =0.0006900048077192579
+    round_usd_stencil[1001] = 0.0037699501474772350     # $1,000
+    round_usd_stencil[1002] = 0.0030872891064215764     # (larger needed range for fees)
+    round_usd_stencil[1003] = 0.0023237040836798163
+    round_usd_stencil[1061] = 0.0023671764210889895     # $2,000
+    round_usd_stencil[1062] = 0.0020106877104798474
+    round_usd_stencil[1140] = 0.0009099214128654502     # $3,000
+    round_usd_stencil[1141] = 0.0012008546799361498
+    round_usd_stencil[1201] = 0.0007862586076341524     # $10,000
+    round_usd_stencil[1202] = 0.0006900048077192579
 
     round_usd_stencil
   end
@@ -363,14 +342,12 @@ class Oracle
     y, m, d = date.split '-'
     valid_format = Date.valid_date? y.to_i, m.to_i, d.to_i
 
-    valid_range = (Date.parse(date) > Date.parse("2020-7-26")) &&
-      (Date.parse(date) < Date.today)
+    valid_range = (Date.parse(date) > Date.parse('2020-7-26')) &&
+                  (Date.parse(date) < Date.today)
 
     valid_format && valid_range
   end
-
 end
 
-
-oracle = Oracle.new("aUser", "aPassword", "127.0.0.1", "8332", logs=true)
-oracle.price("2021-09-10")
+oracle = Oracle.new('aUser', 'aPassword', '127.0.0.1', '8332', logs = true)
+oracle.price('2021-09-10')

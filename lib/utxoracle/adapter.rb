@@ -1,12 +1,11 @@
-# TODO - Interface for adapters to a bitcoin core RPC
+# TODO: - Interface for adapters to a bitcoin core RPC
 
 class Adapter
-
   def init
     raise NoMethodError
   end
 
-  # TODO - Define OTF
+  # TODO: - Define OTF
   def getblockcount
     raise NoMethodError
   end

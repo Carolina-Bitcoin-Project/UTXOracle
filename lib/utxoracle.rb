@@ -5,5 +5,4 @@ require_relative 'utxoracle/version'
 require_relative 'utxoracle/oracle'
 
 module Utxoracle
-
 end
