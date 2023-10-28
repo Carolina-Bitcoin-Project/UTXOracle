@@ -1,5 +1,5 @@
 require 'time'
-require './rpc.rb'
+require_relative 'rpc.rb'
 
 class Oracle
 
@@ -9,6 +9,7 @@ class Oracle
   TESTNET_PORT          = 18332.freeze
   NUMBER_OF_BINS        = 2401.freeze
 
+  # TODO - Thread safety
   def initialize(rpcuser, rpcpassword, ip, port, log=false)
     @client             = Rpc.new("http://#{rpcuser}:#{rpcpassword}@#{ip}:#{port}")
     @round_usd_stencil  = build_round_usd_stencil
@@ -33,7 +34,7 @@ class Oracle
 
   private
 
-  # TODO - this is very procedural right now. We can DRY this out later on.
+  # TODO - Very procedural. Refactor
   def run
     block_count     = @client.getblockcount
     block_hash      = @client.getblockhash(block_count)

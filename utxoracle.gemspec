@@ -1,17 +1,25 @@
 # frozen_string_literal: true
 
-require_relative 'lib/utxoracle/version'
+lib = File.expand_path('../lib/', __FILE__)
+$:.unshift lib unless $:.include?(lib)
+
+require 'utxoracle/version'
 
 Gem::Specification.new do |spec|
-  spec.name = 'UTXOracle'
-  spec.version = UTXOracle::VERSION
-  spec.authors = ['Keith Gardner']
+  spec.name                   = 'utxoracle'
+  spec.version                = Utxoracle::VERSION
+  spec.platform               = Gem::Platform::RUBY
+  spec.authors                = ['Keith Gardner']
 
-  spec.summary = 'Object oriented interface for UTXOracle'
-  spec.description = 'Object oriented interface for UTXOracle'
-  spec.homepage = 'https://github.com/Carolina-Bitcoin-Project/UTXOracle'
-  spec.license = 'MIT'
-  spec.required_ruby_version = '>= 3.1.0'
+  spec.summary                = 'Interface for UTXOracle.'
+  spec.description            = 'Object oriented design for interacting with UTXOracle.'
+  spec.homepage               = 'https://github.com/Carolina-Bitcoin-Project/UTXOracle'
+  spec.license                = 'MIT'
+  spec.required_ruby_version  = '>= 3.1.0'
+
+  spec.files                  = `git ls-files`.split("\n")
+  spec.bindir                 = 'exe'
+  spec.require_path           = 'lib'
 
   spec.add_development_dependency 'rubocop'
 end
