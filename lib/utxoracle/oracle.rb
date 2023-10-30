@@ -348,6 +348,3 @@ class Oracle
     valid_format && valid_range
   end
 end
-
-oracle = Oracle.new('aUser', 'aPassword', '127.0.0.1', '8332', logs = true)
-oracle.price('2021-09-10')
