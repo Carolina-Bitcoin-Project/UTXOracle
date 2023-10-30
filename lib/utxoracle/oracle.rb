@@ -9,7 +9,7 @@ module Utxoracle
     TESTNET_PORT          = 18_332
     NUMBER_OF_BINS        = 2401
 
-    # TODO: - Thread safety
+    # TODO: - Consider multithreading.
     def initialize(rpcuser, rpcpassword, ip, port, log = false)
       @client             = Rpc.new("http://#{rpcuser}:#{rpcpassword}@#{ip}:#{port}")
       @round_usd_stencil  = build_round_usd_stencil
@@ -30,11 +30,12 @@ module Utxoracle
 
       @requested_date = Time.parse requested_date.tr('\n', '')
       @cache[requested_date] = run
+      @cache[requested_date]
     end
 
     private
 
-    # TODO: - Very procedural. Refactor
+    # TODO: - Very procedural - could refactor.
     def run
       block_count     = @client.getblockcount
       block_hash      = @client.getblockhash(block_count)
