@@ -1,12 +1,9 @@
-# TODO: - Interface for adapters to a bitcoin core RPC
-
 module Utxoracle
-  class Adapter
+  class Provider
     def init
       raise NoMethodError
     end
 
-    # TODO: - Define OTF
     def getblockcount
       raise NoMethodError
     end

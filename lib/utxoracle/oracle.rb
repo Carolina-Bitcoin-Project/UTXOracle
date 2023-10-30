@@ -1,5 +1,6 @@
 require 'time'
 require_relative 'rpc'
+require_relative 'providers/raw_bitcoin_node'
 
 module Utxoracle
   class Oracle
@@ -9,11 +10,10 @@ module Utxoracle
     TESTNET_PORT          = 18_332
     NUMBER_OF_BINS        = 2401
 
-    # TODO: - Consider multithreading.
-    def initialize(rpcuser, rpcpassword, ip, port, log = false)
-      @client             = Rpc.new("http://#{rpcuser}:#{rpcpassword}@#{ip}:#{port}")
-      @round_usd_stencil  = build_round_usd_stencil
+    def initialize(provider, log = false)
+      @provider           = provider
       @log                = log
+      @round_usd_stencil  = build_round_usd_stencil
       @cache              = {}
     end
 
@@ -35,11 +35,11 @@ module Utxoracle
 
     private
 
-    # TODO: - Very procedural - could refactor.
+    # TODO: - Very procedural. Refactor.
     def run
-      block_count     = @client.getblockcount
-      block_hash      = @client.getblockhash(block_count)
-      blockheader     = @client.getblockheader(block_hash, true)
+      block_count     = @provider.getblockcount
+      block_hash      = @provider.getblockhash(block_count)
+      blockheader     = @provider.getblockheader(block_hash, true)
 
       time_datetime = Time.at(blockheader['time']).utc
       latest_year = time_datetime.year
@@ -59,8 +59,8 @@ module Utxoracle
       blocks_ago_estimate = (144 * seconds_since_price_day.to_f / SECONDS_IN_A_DAY.to_f).round
       price_day_block_estimate = (block_count - blocks_ago_estimate).to_i
 
-      block_hash_b       = @client.getblockhash(price_day_block_estimate)
-      block_header       = @client.getblockheader(block_hash_b, true)
+      block_hash_b       = @provider.getblockhash(price_day_block_estimate)
+      block_header       = @provider.getblockheader(block_hash_b, true)
       time_in_seconds = block_header['time']
 
       seconds_difference = time_in_seconds - price_day_seconds
@@ -73,8 +73,8 @@ module Utxoracle
         last_estimate = block_jump_estimate
 
         price_day_block_estimate -= block_jump_estimate
-        block_hash_b       = @client.getblockhash(price_day_block_estimate)
-        block_header       = @client.getblockheader(block_hash_b, true)
+        block_hash_b       = @provider.getblockhash(price_day_block_estimate)
+        block_header       = @provider.getblockheader(block_hash_b, true)
 
         time_in_seconds = block_header['time']
         seconds_difference = time_in_seconds - price_day_seconds
@@ -84,8 +84,8 @@ module Utxoracle
       if time_in_seconds > price_day_seconds
         while time_in_seconds > price_day_seconds
           price_day_block_estimate -= 1
-          block_hash_b       = @client.getblockhash(price_day_block_estimate)
-          block_header       = @client.getblockheader(block_hash_b, true)
+          block_hash_b       = @provider.getblockhash(price_day_block_estimate)
+          block_header       = @provider.getblockheader(block_hash_b, true)
           time_in_seconds = block_header['time']
         end
 
@@ -93,15 +93,14 @@ module Utxoracle
       elsif time_in_seconds < price_day_seconds
         while time_in_seconds < price_day_seconds
           price_day_block_estimate += 1
-          block_hash_b       = @client.getblockhash(price_day_block_estimate)
-          block_header       = @client.getblockheader(block_hash_b, true)
+          block_hash_b       = @provider.getblockhash(price_day_block_estimate)
+          block_header       = @provider.getblockheader(block_hash_b, true)
           time_in_seconds = block_header['time']
         end
       end
 
       price_day_block = price_day_block_estimate
 
-      # 5
       first_bin_value = -6
       last_bin_value = 6
       range_bin_values = last_bin_value - first_bin_value
@@ -120,14 +119,13 @@ module Utxoracle
         output_bell_curve_bin_counts << 0.0
       end
 
-      # 6
       puts("Reading all blocks on #{price_day_date_utc}...") if @log
       puts('This will take a few minutes (~144 blocks)...') if @log
       puts("Height\tTime(utc)\t Completion %") if @log
 
       block_height = price_day_block_estimate
-      block_hash_b = @client.getblockhash(block_height)
-      block_b = @client.getblock(block_hash_b, 2)
+      block_hash_b = @provider.getblockhash(block_height)
+      block_b = @provider.getblock(block_hash_b, 2)
 
       time = Time.at(block_b['time']).utc
       time_in_seconds = block_b['time']
@@ -165,8 +163,8 @@ module Utxoracle
         end
 
         block_height += 1
-        block_hash_b = @client.getblockhash(block_height)
-        block_b = @client.getblock(block_hash_b, 2)
+        block_hash_b = @provider.getblockhash(block_height)
+        block_b = @provider.getblock(block_hash_b, 2)
 
         time = Time.at(block_b['time']).utc
         time_in_seconds = block_b['time']
@@ -177,7 +175,6 @@ module Utxoracle
 
       puts "blocks_on_this_day: #{blocks_on_this_day}" if @log
 
-      # 7
       for n in 0..201 - 1
         output_bell_curve_bin_counts[n] = 0.0
       end
@@ -202,7 +199,6 @@ module Utxoracle
         output_bell_curve_bin_counts[n] = 0.008 if output_bell_curve_bin_counts[n] > 0.008
       end
 
-      # 9
       best_slide       = 0
       best_slide_score = 0.0
       total_score      = 0.0
@@ -261,7 +257,7 @@ module Utxoracle
       w2 = a2 / (a1 + a2)
       price_estimate = (w1 * btc_in_usd_best + w2 * btc_in_usd_2nd).to_i
 
-      puts "price_estimate is #{price_estimate}"
+      puts "price_estimate is #{price_estimate}" if @log
 
       price_estimate
     end
@@ -345,7 +341,7 @@ module Utxoracle
       valid_format = Date.valid_date? y.to_i, m.to_i, d.to_i
 
       valid_range = (Date.parse(date) > Date.parse('2020-7-26')) &&
-        (Date.parse(date) < Date.today)
+                    (Date.parse(date) < Date.today)
 
       valid_format && valid_range
     end
