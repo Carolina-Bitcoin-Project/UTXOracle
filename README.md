@@ -70,7 +70,7 @@ Rake tasks to test, lint and audit the gem for security vulnerabilities and docu
 rake rubocop                  # Run RuboCop
 rake rubocop:autocorrect      # Autocorrect RuboCop offenses (only when it's safe)
 rake rubocop:autocorrect_all  # Autocorrect RuboCop offenses (safe and unsafe)
-rake spec                     # Run RSpec code examples
+rake spec                     # Run tests
 ```
 
 ## Contributing
