@@ -1,5 +1,5 @@
 # UTXOracle.rb
-Ruby implementation of https://utxo.live/oracle/. Please note this is a WIP; API is likely to change as the gem is still in development and has not reached a stable release. Use with Caution.
+Ruby implementation of https://utxo.live/oracle/.
 
 (Original implementation by [SteveSimple](https://twitter.com/SteveSimple) & [DanielLHinton](https://twitter.com/DanielLHinton) who discovered and built the first offline bitcoin price oracle.)
 
@@ -13,13 +13,6 @@ Ruby implementation of https://utxo.live/oracle/. Please note this is a WIP; API
 - [Contributing](#contributing)
 - [License](#license)
 
-```
-$ ./bin/console
-[1] pry(main)> provider = Utxoracle::RawBitcoinNode.new("aUser", "aPassword", "127.0.0.1", 8332)
-[2] pry(main)> oracle = Utxoracle::Oracle.new(provider)
-[3] pry(main)> oracle.price("2023-10-30")
-
-```
 
 ## Installation
 
