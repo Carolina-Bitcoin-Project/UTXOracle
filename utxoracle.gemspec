@@ -21,6 +21,8 @@ Gem::Specification.new do |spec|
   spec.bindir                 = 'exe'
   spec.require_path           = 'lib'
 
+  spec.add_dependency 'typhoeus'
+
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec'
