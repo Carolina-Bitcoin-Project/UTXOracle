@@ -37,8 +37,18 @@ require 'utxoracle'
 
 ### Fetching price
 
+#### Using a raw bitcoin node
 ```ruby
 provider = Utxoracle::RawBitcoinNode.new("aUser", "aPassword", "127.0.0.1", 8332)
+```
+
+#### Using mempool.space node
+```ruby
+provider = Utxoracle::MempoolDotSpace.new
+```
+
+#### 
+```ruby
 oracle = Utxoracle::Oracle.new(provider)
 oracle.price("2023-10-30")
 34840
