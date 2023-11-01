@@ -47,7 +47,7 @@ provider = Utxoracle::RawBitcoinNode.new("aUser", "aPassword", "127.0.0.1", 8332
 provider = Utxoracle::MempoolDotSpace.new
 ```
 
-#### 
+####
 ```ruby
 oracle = Utxoracle::Oracle.new(provider)
 oracle.price("2023-10-30")
@@ -70,10 +70,17 @@ The health and maintainability of the codebase is ensured through a set of
 Rake tasks to test, lint and audit the gem for security vulnerabilities and documentation:
 
 ```
+rake build                    # Build utxoracle-0.0.1.gem into the pkg directory
+rake build:checksum           # Generate SHA512 checksum if utxoracle-0.0.1.gem into the checksums directory
+rake clean                    # Remove any temporary products
+rake clobber                  # Remove any generated files
+rake install                  # Build and install utxoracle-0.0.1.gem into system gems
+rake install:local            # Build and install utxoracle-0.0.1.gem into system gems without network access
+rake release[remote]          # Create tag v0.0.1 and build and push utxoracle-0.0.1.gem to rubygems.org
 rake rubocop                  # Run RuboCop
 rake rubocop:autocorrect      # Autocorrect RuboCop offenses (only when it's safe)
 rake rubocop:autocorrect_all  # Autocorrect RuboCop offenses (safe and unsafe)
-rake spec                     # Run tests
+rake spec                     # Run RSpec code examples
 ```
 
 ## Contributing
