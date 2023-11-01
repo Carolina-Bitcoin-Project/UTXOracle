@@ -1,3 +1,5 @@
+[![Gem Version](https://badge.fury.io/rb/utxoracle.svg)](https://badge.fury.io/rb/utxoracle)
+
 # UTXOracle.rb
 Ruby implementation of https://utxo.live/oracle/.
 
