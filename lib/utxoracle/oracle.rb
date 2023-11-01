@@ -35,7 +35,10 @@ module Utxoracle
 
     private
 
-    # TODO: - Very procedural. Refactor.
+    # TODO: - Refactor.
+    # We need this code to be "plug and play" - so stats wizards can
+    # quickly iterate on different models. Or even chat-gpt to cross
+    # reference with historical exchange prices.
     def run
       block_count     = @provider.getblockcount
       block_hash      = @provider.getblockhash(block_count)
