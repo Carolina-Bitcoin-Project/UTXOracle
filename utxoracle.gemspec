@@ -11,17 +11,17 @@ Gem::Specification.new do |spec|
   spec.platform               = Gem::Platform::RUBY
   spec.authors                = ['Keith Gardner']
 
-  spec.summary                = 'Interface for UTXOracle.'
-  spec.description            = 'Object oriented design for interacting with UTXOracle.'
+  spec.summary                = 'Offline price oracle for Bitcoin.'
+  spec.description            = 'Offline price oracle for Bitcoin. Offers programmable data providers (Bitcoin node, mempool, etc). Can be used from commandline, or integrated deep into ruby stacks.'
   spec.homepage               = 'https://github.com/Carolina-Bitcoin-Project/UTXOracle'
   spec.license                = 'MIT'
   spec.required_ruby_version  = '>= 3.1.0'
 
   spec.files                  = `git ls-files`.split("\n")
-  spec.bindir                 = 'exe'
+  spec.bindir                 = 'bin'
   spec.require_path           = 'lib'
 
-  spec.add_dependency 'typhoeus'
+  spec.add_dependency 'typhoeus', '~> 1.4.0'
 
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'rake'

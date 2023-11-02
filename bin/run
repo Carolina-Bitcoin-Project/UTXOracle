@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'bundler/setup'
+require 'utxoracle'
+
+# TODO: - command line args & example
+provider = Utxoracle::RawBitcoinNode.new('aUser', 'aPassword', '127.0.0.1', 8332)
+oracle = Utxoracle::Oracle.new(provider, true)
+oracle.price(ARGV[0])
