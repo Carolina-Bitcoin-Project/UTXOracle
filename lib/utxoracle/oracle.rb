@@ -18,12 +18,14 @@ module Utxoracle
 
     def price(requested_date)
       unless validate_date(requested_date)
-        puts "Invalid date.\nEarliest available: 2020-07-26.\nLatest available #{Date.today}.\nFormat: YYYY-MM-DD."
-        return
+        if @log
+          puts "Invalid date.\nEarliest available: 2020-07-26.\nLatest available #{Date.today}.\nFormat: YYYY-MM-DD."
+        end
+        return -1
       end
 
       if price_estimate = @cache[requested_date]
-        puts "price_estimate is #{price_estimate}"
+        puts "price_estimate is #{price_estimate}" if @log
         return price_estimate
       end
 
@@ -123,7 +125,7 @@ module Utxoracle
 
       puts("Reading all blocks on #{price_day_date_utc}...") if @log
       puts('This will take a few minutes (~144 blocks)...') if @log
-      puts("Height\tTime(utc)\t Completion %") if @log
+      puts("Height\tTime(utc)\tCompletion %") if @log
 
       block_height = price_day_block_estimate
       block_hash_b = @provider.getblockhash(block_height)
@@ -142,8 +144,8 @@ module Utxoracle
       while target == day
         blocks_on_this_day += 1
 
-        progress_estimate = 100.0 * (hour + minute / 60) / 24.0
-        puts("#{block_height}\t#{time.strftime('%H:%M:%S')}\t#{progress_estimate}") if @log
+        progress_estimate = 100.0 * (hour + minute / 60.0) / 24.0
+        puts("#{block_height}\t#{time.strftime('%H:%M:%S')}\t#{progress_estimate.round(2)}") if @log
 
         for tx in block_b['tx']
           outputs = tx['vout']
@@ -346,6 +348,8 @@ module Utxoracle
                     (Date.parse(date) < Date.today)
 
       valid_format && valid_range
+    rescue Date::Error
+      false
     end
   end
 end

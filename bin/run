@@ -4,7 +4,12 @@
 require 'bundler/setup'
 require 'utxoracle'
 
-# TODO: - command line args & example
-provider = Utxoracle::RawBitcoinNode.new('aUser', 'aPassword', '127.0.0.1', 8332)
+user = ARGV[0]
+password = ARGV[1]
+ip = ARGV[2]
+port = ARGV[3]
+date = ARGV[4]
+
+provider = Utxoracle::Node.new(user, password, ip, port)
 oracle = Utxoracle::Oracle.new(provider, true)
-oracle.price(ARGV[0])
+oracle.price(date)
