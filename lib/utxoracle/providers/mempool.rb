@@ -5,7 +5,7 @@ require_relative '../request'
 # and throttles the number of requests the oracle takes to compute.
 # Running this requires an Enterprise license.
 module Utxoracle
-  class MempoolDotSpace < Provider
+  class Mempool < Provider
     def initialize; end
 
     def getblockcount

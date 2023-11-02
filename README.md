@@ -39,14 +39,14 @@ require 'utxoracle'
 
 ### Fetching price
 
-#### Using a raw bitcoin node
+#### Using a specific bitcoin node
 ```ruby
-provider = Utxoracle::RawBitcoinNode.new("aUser", "aPassword", "127.0.0.1", 8332)
+provider = Utxoracle::Node.new("aUser", "aPassword", "127.0.0.1", 8332)
 ```
 
 #### Using mempool.space node
 ```ruby
-provider = Utxoracle::MempoolDotSpace.new
+provider = Utxoracle::Mempool.new
 ```
 
 ####

@@ -1,6 +1,5 @@
 require 'time'
 require_relative 'rpc'
-require_relative 'providers/raw_bitcoin_node'
 
 module Utxoracle
   class Oracle

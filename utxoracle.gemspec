@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.authors                = ['Keith Gardner']
 
   spec.summary                = 'Offline price oracle for Bitcoin.'
-  spec.description            = 'Offline price oracle for Bitcoin. Offers programmable data providers (Bitcoin node, mempool, etc). Can be used from commandline, or integrated deep into ruby stacks.'
+  spec.description            = 'Offline price oracle for Bitcoin. Offers programmable data providers (Bitcoin node, mempool, etc). Can be used from commandline, or integrated into existing ruby stacks.'
   spec.homepage               = 'https://github.com/Carolina-Bitcoin-Project/UTXOracle'
   spec.license                = 'MIT'
   spec.required_ruby_version  = '>= 3.1.0'

@@ -2,7 +2,7 @@ require_relative '../provider'
 require_relative '../rpc'
 
 module Utxoracle
-  class RawBitcoinNode < Provider
+  class Node < Provider
     def initialize(rpcuser, rpcpassword, ip, port)
       @rpc = Rpc.new("http://#{rpcuser}:#{rpcpassword}@#{ip}:#{port}")
     end
