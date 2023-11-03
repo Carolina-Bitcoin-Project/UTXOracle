@@ -1,9 +1,17 @@
 [![Gem Version](https://badge.fury.io/rb/utxoracle.svg)](https://badge.fury.io/rb/utxoracle)
 
-# UTXOracle.rb
-Ruby implementation of https://utxo.live/oracle/.
+# Utxoracle
+Offline price oracle for Bitcoin written in Ruby.
 
-(Original implementation by [SteveSimple](https://twitter.com/SteveSimple) & [DanielLHinton](https://twitter.com/DanielLHinton) who discovered and built the first offline bitcoin price oracle.)
+In September 2023 [SteveSimple](https://twitter.com/SteveSimple) & [DanielLHinton](https://twitter.com/DanielLHinton) [dropped](https://twitter.com/SteveSimple/status/1704864674431332503) https://utxo.live/oracle/ - the first method I've seen to derive historical USD price of bitcoin based purely on UTXO set.
+
+Needless to say, a lot of bitcoiners found this VERY cool. We're in a unique phase of history; transitioning from the Dollar Network to a Bitcoin Standard. Pulling out these patterns sparks joy.
+
+The purpose of releasing Utxoracle as a Gem is multi-fold:
+1. Make the tool available as a Gem to the Ruby community.
+2. Provide a flexible API, where folks can extend this for other use cases (currencies, language, etc).
+3. Provide a _modular_ provider model, so folks can pull data from mempool.space or other RPCs.
+
 
 ## Table of contents
 
