@@ -1,5 +1,4 @@
 require 'time'
-require_relative 'rpc'
 
 module Utxoracle
   class Oracle
