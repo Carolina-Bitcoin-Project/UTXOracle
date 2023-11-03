@@ -3,7 +3,7 @@
 # Utxoracle
 Offline price oracle for Bitcoin written in Ruby.
 
-In September 2023 [SteveSimple](https://twitter.com/SteveSimple) & [DanielLHinton](https://twitter.com/DanielLHinton) [dropped](https://twitter.com/SteveSimple/status/1704864674431332503) https://utxo.live/oracle/ - the first method I've seen to derive historical USD price of bitcoin based purely on UTXO set.
+In September 2023 [SteveSimple](https://twitter.com/SteveSimple) & [DanielLHinton](https://twitter.com/DanielLHinton) [dropped](https://twitter.com/SteveSimple/status/1704864674431332503) https://utxo.live/oracle/, the first method to derive historical USD price of bitcoin based purely on UTXO set.
 
 Needless to say, a lot of bitcoiners found this VERY cool. We're in a unique phase of history; transitioning from the Dollar Network to a Bitcoin Standard. Pulling out these patterns sparks joy.
 
