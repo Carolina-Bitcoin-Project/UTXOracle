@@ -8,7 +8,7 @@ In September 2023 [SteveSimple](https://twitter.com/SteveSimple) & [DanielLHinto
 Needless to say, a lot of bitcoiners found this VERY cool. We're in a unique phase of history; transitioning from the Dollar Network to a Bitcoin Standard. Pulling out these patterns sparks joy.
 
 The purpose of releasing Utxoracle as a Gem is multi-fold:
-1. Make the tool available as a Gem to the Ruby community.
+1. Make the tool available as a [Gem](https://rubygems.org/gems/utxoracle) to the Ruby community.
 2. Provide a flexible API, where folks can extend this for other use cases (currencies, language, etc).
 3. Provide a _modular_ provider model, so folks can pull data from mempool.space or other RPCs.
 
