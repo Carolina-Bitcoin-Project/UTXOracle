@@ -44,29 +44,42 @@ All examples below assume that the gem has been required.
 require 'utxoracle'
 ```
 
-
 ### Fetching price
 
 #### Using a specific bitcoin node
+
+`bitcoin.conf` would look like:
+```txt
+server=1
+rpcuser=aUser
+rpcpassword=aPassword
+```
 ```ruby
 provider = Utxoracle::Node.new("aUser", "aPassword", "127.0.0.1", 8332)
-```
-
-#### Using mempool.space node
-```ruby
-provider = Utxoracle::Mempool.new
-```
-
-####
-```ruby
-oracle = Utxoracle::Oracle.new(provider)
+oracle = Utxoracle::Oracle.new(provider, log = true)
 oracle.price("2023-10-30")
 34840
 ```
 
+#### Using mempool.space node
+
+```ruby
+# Mempool will probably throttle you without an enterprise license
+provider = Utxoracle::Mempool.new
+oracle = Utxoracle::Oracle.new(provider, log = true)
+oracle.price("2023-10-30")
+34840
+```
+
+### Command line usage
+```bash
+$ ./bin/run <username> <password> 127.0.0.1 8332 2023-10-10
+```
+
+
 ## Development
 
-After checking out the repo, run `bundle i` to install dependencies.
+After checking out the repo, run `bundle install` to install dependencies.
 
 To install this gem onto your local machine, run `bundle exec rake install`.
 
