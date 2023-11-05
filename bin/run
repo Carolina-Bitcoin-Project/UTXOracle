@@ -9,7 +9,19 @@ password = ARGV[1]
 ip = ARGV[2]
 port = ARGV[3]
 date = ARGV[4]
+profile = ARGV[5]
 
-provider = Utxoracle::Node.new(user, password, ip, port)
-oracle = Utxoracle::Oracle.new(provider, true)
-oracle.price(date)
+
+if profile
+  require 'stackprof'
+  # See https://github.com/tmm1/stackprof#sampling: for :cpu, :wall, :object
+  StackProf.run(mode: :wall, out: 'tmp/stackprof-wall.dump', raw: true) do
+    provider = Utxoracle::Node.new(user, password, ip, port)
+    oracle = Utxoracle::Oracle.new(provider, log = true)
+    oracle.price(date)
+  end
+else
+  provider = Utxoracle::Node.new(user, password, ip, port)
+  oracle = Utxoracle::Oracle.new(provider, log = true)
+  oracle.price(date)
+end
