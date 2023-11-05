@@ -24,7 +24,7 @@ module Utxoracle
       end
 
       if price_estimate = @cache[requested_date]
-        puts "price_estimate is #{price_estimate}" if @log
+        puts "Price Estimate: $#{price_estimate.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse}" if @log
         return price_estimate
       end
 
@@ -260,7 +260,7 @@ module Utxoracle
       w2 = a2 / (a1 + a2)
       price_estimate = (w1 * btc_in_usd_best + w2 * btc_in_usd_2nd).to_i
 
-      puts "price_estimate is #{price_estimate}" if @log
+      puts "Price Estimate: $#{price_estimate.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse}" if @log
 
       price_estimate
     end

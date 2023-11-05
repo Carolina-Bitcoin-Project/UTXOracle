@@ -89,7 +89,7 @@ Height  Time(utc)       Completion %
 811932  23:44:01        98.89
 811933  23:48:40        99.17
 blocks_on_this_day: 165
-price_estimate is 27045
+Price Estimate: $27,045
 ```
 
 
