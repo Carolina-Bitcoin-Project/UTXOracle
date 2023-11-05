@@ -56,7 +56,7 @@ rpcpassword=aPassword
 ```
 ```ruby
 provider = Utxoracle::Node.new("aUser", "aPassword", "127.0.0.1", 8332)
-oracle = Utxoracle::Oracle.new(provider, log = true)
+oracle = Utxoracle::Oracle.new(provider, log = false)
 oracle.price("2023-10-30")
 34840
 ```
@@ -64,16 +64,32 @@ oracle.price("2023-10-30")
 #### Using mempool.space node
 
 ```ruby
-# Mempool will probably throttle you without an enterprise license
+# Mempool will throttle you without an enterprise license
 provider = Utxoracle::Mempool.new
-oracle = Utxoracle::Oracle.new(provider, log = true)
+oracle = Utxoracle::Oracle.new(provider, log = false)
 oracle.price("2023-10-30")
 34840
 ```
 
 ### Command line usage
 ```bash
-$ ./bin/run <username> <password> 127.0.0.1 8332 2023-10-10
+$ ./bin/run aUser aPassword 127.0.0.1 8332 2023-10-10
+Reading all blocks on 2023-10-12 00:00:00 -0400...
+This will take a few minutes (~144 blocks)...
+Height  Time(utc)       Completion %
+811769  00:18:31        1.25
+811770  00:22:48        1.53
+811771  00:24:24        1.67
+811772  00:33:32        2.29
+811773  00:38:14        2.64
+811774  01:06:40        4.58
+811775  01:09:07        4.79
+...
+811931  23:41:09        98.68
+811932  23:44:01        98.89
+811933  23:48:40        99.17
+blocks_on_this_day: 165
+price_estimate is 27045
 ```
 
 
