@@ -1,10 +1,10 @@
 require_relative '../provider'
-require_relative '../rpc'
+require 'cleanrpc'
 
 module Utxoracle
   class Node < Provider
     def initialize(rpcuser, rpcpassword, ip, port)
-      @rpc = Rpc.new("http://#{rpcuser}:#{rpcpassword}@#{ip}:#{port}")
+      @rpc = Cleanrpc::Rpc.new("http://#{rpcuser}:#{rpcpassword}@#{ip}:#{port}")
     end
 
     def getblockcount
