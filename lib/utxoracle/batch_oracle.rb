@@ -2,7 +2,6 @@
 
 module Utxoracle
   class BatchOracle
-
     def initialize(provider, log = false)
       @provider   = provider
       @log        = log

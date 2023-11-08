@@ -30,10 +30,10 @@ if profile
     puts oracle.price(date)
   end
 else
-  time = Benchmark.measure {
+  time = Benchmark.measure do
     provider = Utxoracle::Node.new(user, password, ip, port)
     oracle = Utxoracle::Oracle.new(provider, log = false)
     puts oracle.price(date)
-  }
+  end
   puts time
 end
