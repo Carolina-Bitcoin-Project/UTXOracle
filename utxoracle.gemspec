@@ -21,8 +21,8 @@ Gem::Specification.new do |spec|
   spec.bindir                 = 'bin'
   spec.require_path           = 'lib'
 
-  spec.add_dependency 'typhoeus', '~> 1.4.0'
   spec.add_dependency 'cleanrpc', '~> 0.0.2'
+  spec.add_dependency 'typhoeus', '~> 1.4.0'
 
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'rake'

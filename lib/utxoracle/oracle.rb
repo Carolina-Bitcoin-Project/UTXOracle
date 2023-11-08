@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'time'
 
 module Utxoracle
   class Oracle
-    SECONDS_IN_A_DAY      = 60 * 60 * 24
+    SECONDS_PER_DAY       = 86_400
     FOUR_HOURS            = 14_400
     MAINNET_PORT          = 8332
     TESTNET_PORT          = 18_332
@@ -51,7 +53,7 @@ module Utxoracle
       latest_utc_midnight = Time.new(latest_year, latest_month, latest_day).utc
 
       latest_time_in_seconds = blockheader['time']
-      yesterday_seconds = latest_time_in_seconds - SECONDS_IN_A_DAY
+      yesterday_seconds = latest_time_in_seconds - SECONDS_PER_DAY
       latest_price_day = Time.at(yesterday_seconds).utc
       latest_price_date = latest_price_day.utc.strftime('%Y-%m-%d')
 
@@ -59,7 +61,7 @@ module Utxoracle
       price_day_date_utc = @requested_date
 
       seconds_since_price_day = latest_time_in_seconds - price_day_seconds
-      blocks_ago_estimate = (144 * seconds_since_price_day.to_f / SECONDS_IN_A_DAY.to_f).round
+      blocks_ago_estimate = (144 * seconds_since_price_day.to_f / SECONDS_PER_DAY.to_f).round
       price_day_block_estimate = (block_count - blocks_ago_estimate).to_i
 
       block_hash_b       = @provider.getblockhash(price_day_block_estimate)
@@ -67,7 +69,7 @@ module Utxoracle
       time_in_seconds = block_header['time']
 
       seconds_difference = time_in_seconds - price_day_seconds
-      block_jump_estimate = (144.0 * seconds_difference / SECONDS_IN_A_DAY).round
+      block_jump_estimate = (144.0 * seconds_difference / SECONDS_PER_DAY).round
 
       last_estimate = 0
       last_last_estimate = 0
@@ -81,7 +83,7 @@ module Utxoracle
 
         time_in_seconds = block_header['time']
         seconds_difference = time_in_seconds - price_day_seconds
-        block_jump_estimate = (144.0 * seconds_difference / SECONDS_IN_A_DAY).round
+        block_jump_estimate = (144.0 * seconds_difference / SECONDS_PER_DAY).round
       end
 
       if time_in_seconds > price_day_seconds

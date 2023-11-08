@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'bundler/setup'
+require 'utxoracle'
+
+user        = ARGV[0]
+password    = ARGV[1]
+ip          = ARGV[2]
+port        = ARGV[3]
+start_date  = ARGV[4]
+end_date    = ARGV[5]
+
+provider = Utxoracle::Node.new(user, password, ip, port)
+batch_oracle = Utxoracle::BatchOracle.new(provider)
+batch_oracle.prices(start_date, end_date)

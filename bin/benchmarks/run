@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# This is a copy of bin/run but with timing code.
+# Usage:
+#
+# Basic wall clock measurement:
+# $ ./bin/benchmarks/run aUser aPassword 127.0.0.1 8332 2023-10-01
+#
+# With StackProf measurement:
+# ./bin/benchmarks/run aUser aPassword 127.0.0.1 8332 2023-10-01 true
+
+require 'bundler/setup'
+require 'utxoracle'
+require 'benchmark'
+
+user        = ARGV[0]
+password    = ARGV[1]
+ip          = ARGV[2]
+port        = ARGV[3]
+date        = ARGV[4]
+profile     = ARGV[5]
+
+if profile
+  require 'stackprof'
+  # See https://github.com/tmm1/stackprof#sampling: for :cpu, :wall, :object
+  StackProf.run(mode: :wall, out: 'tmp/stackprof-wall.dump', raw: true) do
+    provider = Utxoracle::Node.new(user, password, ip, port)
+    oracle = Utxoracle::Oracle.new(provider, log = false)
+    puts oracle.price(date)
+  end
+else
+  time = Benchmark.measure {
+    provider = Utxoracle::Node.new(user, password, ip, port)
+    oracle = Utxoracle::Oracle.new(provider, log = false)
+    puts oracle.price(date)
+  }
+  puts time
+end
